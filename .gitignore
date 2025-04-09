@@ -1,0 +1,14 @@
+# Godot 4+ specific ignores
+.godot/
+/android/
+.import/
+
+# Игнорируем файлы экспорта
+export.cfg
+
+# Игнорируем кэш-файлы и временные файлы
+*.tmp
+
+# Игнорируем системные файлы Windows
+Thumbs.db
+desktop.ini
