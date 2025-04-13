@@ -15,7 +15,9 @@ func _ready():
 	setup_connections()
 
 func setup_connections():
-	var fox = get_parent().get_node("Fox")
+	var fox = FoxController.spawn_fox()
+
+	get_parent().call_deferred("add_child", fox) # или get_tree().get_root().add_child(fox)
 	fox.connect("dialog_finished",Callable(self, "on_dialog_finished"))
 	
 	var axe = get_parent().get_node("Axe")

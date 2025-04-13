@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://b5kw6opgdxigh"]
+
+[ext_resource type="Script" uid="uid://c0k8gjy8r02wd" path="res://Scripts/fox.gd" id="1_m68ih"]
+
+[node name="Fox" type="Node2D"]
+script = ExtResource("1_m68ih")
