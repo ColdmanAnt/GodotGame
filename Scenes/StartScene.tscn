@@ -1,0 +1,24 @@
+[gd_scene load_steps=6 format=3 uid="uid://5bdxvpffxkgg"]
+
+[ext_resource type="Script" uid="uid://lt7lt5s72exn" path="res://Scripts/tutorial_manager.gd" id="1_dgtb2"]
+[ext_resource type="Script" uid="uid://c0k8gjy8r02wd" path="res://Scripts/fox.gd" id="2_t5ln1"]
+[ext_resource type="Script" uid="uid://cjxcb1m23ymt6" path="res://Scripts/axe.gd" id="3_k8nbv"]
+[ext_resource type="Script" uid="uid://c83cnve1cnjw2" path="res://Scripts/stump.gd" id="4_ia2xn"]
+[ext_resource type="Script" uid="uid://cy6ii4ctjdmc8" path="res://Scripts/enemy.gd" id="5_u668n"]
+
+[node name="StartScene" type="Node2D"]
+
+[node name="TutorialManager" type="Node" parent="."]
+script = ExtResource("1_dgtb2")
+
+[node name="Fox" type="Node2D" parent="."]
+script = ExtResource("2_t5ln1")
+
+[node name="Axe" type="Node2D" parent="."]
+script = ExtResource("3_k8nbv")
+
+[node name="Stump" type="Node2D" parent="."]
+script = ExtResource("4_ia2xn")
+
+[node name="Enemy" type="Node2D" parent="."]
+script = ExtResource("5_u668n")
