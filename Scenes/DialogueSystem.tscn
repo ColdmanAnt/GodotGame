@@ -1,0 +1,52 @@
+[gd_scene load_steps=5 format=3 uid="uid://be3ubdiubt7f7"]
+
+[ext_resource type="Script" uid="uid://doqf8f7jd2tgn" path="res://Scripts/dialogue_system.gd" id="1_vgbim"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_18b0x"]
+content_margin_left = 20.0
+content_margin_top = 20.0
+content_margin_right = 20.0
+content_margin_bottom = 20.0
+bg_color = Color(0.764706, 0.54902, 0.34902, 0.784314)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0.839216, 0.501961, 0.12549, 0.866667)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="FontFile" id="FontFile_yw0ou"]
+cache/0/16/0/ascent = 0.0
+cache/0/16/0/descent = 0.0
+cache/0/16/0/underline_position = 0.0
+cache/0/16/0/underline_thickness = 0.0
+cache/0/16/0/scale = 1.0
+
+[sub_resource type="LabelSettings" id="LabelSettings_21cs8"]
+line_spacing = 5.0
+paragraph_spacing = 8.0
+font = SubResource("FontFile_yw0ou")
+outline_size = 1
+outline_color = Color(0, 0, 0, 1)
+
+[node name="DialogueSystem" type="CanvasLayer"]
+script = ExtResource("1_vgbim")
+
+[node name="DialogueBox" type="Panel" parent="."]
+offset_left = 232.0
+offset_top = 472.0
+offset_right = 919.0
+offset_bottom = 630.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_18b0x")
+
+[node name="DialogueText" type="Label" parent="DialogueBox"]
+layout_mode = 0
+offset_left = 6.0
+offset_top = 8.0
+offset_right = 680.0
+offset_bottom = 152.0
+label_settings = SubResource("LabelSettings_21cs8")
+autowrap_mode = 3

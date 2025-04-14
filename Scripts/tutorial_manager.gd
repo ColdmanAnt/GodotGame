@@ -24,7 +24,7 @@ var hint_messages := {
 	],
 	Stage.SAT_DOWN: [
 		"Ты сел. Молодец. Теперь надо встать. Это делается ногами.",
-		"Пень не портал в другой мир. Проверь.",
+		"Пень не портал в другой мир. Поверь.",
 		"Не засыпай. Я тебя знаю."
 	],
 	Stage.STANDING_UP: [
@@ -41,14 +41,16 @@ var idle_threshold := 15.0
 var stage_last_updated_time := 0.0
 
 func _ready():
+	await get_tree().process_frame
 	print("Tutorial started. Current stage:", current_stage)
 	setup_connections()
 
 func setup_connections():
 	var fox = FoxController.spawn_fox()
-
-	get_parent().call_deferred("add_child", fox) # или get_tree().get_root().add_child(fox)
-	fox.connect("dialog_finished",Callable(self, "on_dialog_finished"))
+	
+	get_tree().current_scene.add_child(fox)
+	#get_parent().call_deferred("add_child", fox) # или get_tree().get_root().add_child(fox)
+	#fox.connect("dialog_finished",Callable(self, "on_dialog_finished"))
 	
 	var axe = get_parent().get_node("Axe")
 	axe.connect("axe_picked", Callable(self, "on_axe_picked"))
@@ -59,6 +61,8 @@ func setup_connections():
 	
 	var enemy = get_parent().get_node("Enemy")
 	enemy.connect("enemy_defeated", Callable(self, "on_enemy_defeated"))
+	
+	Global.dialogue_system.connect("dialog_finished", Callable(self, "on_dialog_finished"))
 
 func _process(delta: float):
 	idle_timer += delta

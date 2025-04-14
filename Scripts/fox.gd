@@ -1,5 +1,8 @@
 extends Node2D
 
+
+@onready var dialogue_system = get_node("res://Scenes/DialogueSystem.tscn")
+
 enum Mood{
 	NEUTRAL,
 	ANNOYED,
@@ -12,14 +15,19 @@ signal dialog_finished
 var already_talked = false
 var dialog_in_progress = false
 
+
+
+
 func _ready():
-	pass
+	Global.dialogue_system.connect("dialog_finished", Callable(self, "_on_dialog_finished"))
+
 
 func start_initial_dialog():
 	dialog_in_progress = true
 	var lines = ["О, ты проснулся. Я уж думала, ты останешься тут навсегда.",
 		"Меня зовут.... Просто называй меня лисой. Я тут, чтобы тебя не отпускать бездарно умирать."]
-	show_dialog(lines, "main")
+	Global.dialogue_system.start_dialog(lines)
+  
 
 func start_followup_dialog():
 	dialog_in_progress = true

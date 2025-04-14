@@ -1,5 +1,7 @@
 extends Node
 
+var dialogue_system: Node = null
+
 var fox_reputation: int = 0
 
 var reputations := {
