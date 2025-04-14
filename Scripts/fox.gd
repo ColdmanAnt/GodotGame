@@ -19,7 +19,7 @@ func start_initial_dialog():
 	dialog_in_progress = true
 	var lines = ["О, ты проснулся. Я уж думала, ты останешься тут навсегда.",
 		"Меня зовут.... Просто называй меня лисой. Я тут, чтобы тебя не отпускать бездарно умирать."]
-	show_dialog(lines)
+	show_dialog(lines, "main")
 
 func start_followup_dialog():
 	dialog_in_progress = true
@@ -31,15 +31,16 @@ func start_followup_dialog():
 			lines = ["Ты даже что-то умеешь? Посмотрим, время покажет случайность ли это"]
 		Mood.ANNOYED:
 			lines = ["Ты настолько.... медленный. Я ожидала большего"]
-	show_dialog(lines)
+	show_dialog(lines, "chat")
 
-func show_dialog(lines: Array, should_emit: bool = true):
-	print("Fox: ")
+func show_dialog(lines: Array, source: String = "main"):
+	print("Fox:")
 	for line in lines:
 		print(line)
 		await get_tree().create_timer(1.0).timeout
 	dialog_in_progress = false
-	if should_emit:
+
+	if source == "main":
 		emit_signal("dialog_finished")
 	
 	
@@ -56,4 +57,5 @@ func suggest_next_step(text: String):
 	if dialog_in_progress:
 		return
 	dialog_in_progress = true
-	show_dialog([text], false)
+	show_dialog([text], "hint")
+	dialog_in_progress = false 

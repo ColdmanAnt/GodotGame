@@ -9,6 +9,7 @@ enum Stage {
 	ENEMY_DEFEATED
 }
 var current_stage = Stage.START
+var fox_score := 0
 
 var hint_messages := {
 	Stage.AFTER_DIALOG: [
@@ -82,6 +83,7 @@ func check_idle_hint():
 			pass
 func on_dialog_finished():
 	current_stage = Stage.AFTER_DIALOG
+	update_fox_mood()
 	idle_timer = 0.0
 	stage_last_updated_time = 0.0
 	print("Диалог завершён. Теперь подними топор.")
@@ -90,10 +92,10 @@ func on_axe_picked():
 	if current_stage != Stage.AFTER_DIALOG:
 		print("Рановато хвататься за оружие, воин.")
 		return
+	update_fox_mood()
 	idle_timer = 0.0
 	stage_last_updated_time = 0.0
 	current_stage = Stage.GOT_AXE
-	update_fox_mood()
 	print("Топор взят. Теперь сядь.")
 
 func on_sit_down():
@@ -104,9 +106,9 @@ func on_sit_down():
 		Stage.GOT_AXE:
 			current_stage = Stage.SAT_DOWN
 			get_parent().get_node("Stump").set_sitting(true)
+			update_fox_mood()
 			idle_timer = 0.0
 			stage_last_updated_time = 0.0
-			update_fox_mood()
 			print("Игрок сел.")
 		_:
 			print("Ты уже сел. Второй раз не надо.")
@@ -117,19 +119,20 @@ func on_stand_up():
 		return
 	current_stage = Stage.STANDING_UP
 	get_parent().get_node("Stump").set_sitting(false)
+	update_fox_mood()
 	idle_timer = 0.0
 	stage_last_updated_time = 0.0
-	update_fox_mood()
 	print("Игрок встал, вызываю врага")
 
 func on_enemy_defeated():
 	if current_stage != Stage.STANDING_UP:
-		print("Может все таки встанешь уже? Чего прохлаждаешься")
+		print("Может всё таки встанешь уже? Чего прохлаждаешься")
 		return
 	current_stage = Stage.ENEMY_DEFEATED
 	print("Урок окончен.")
-	# TODO: Заменить на переход к экрану завершения или меню
-	get_tree().quit()
+
+	show_fox_final_comment()
+
 
 func _input(event):
 	if event.is_action_pressed("attack"): # <- это action типа "LMB"
@@ -149,10 +152,34 @@ func try_attack():
 	enemy.die()
 
 func update_fox_mood():
-	if idle_timer < 7.0:
+	if idle_timer < idle_threshold/2:
+		fox_score += 2
+		print("FoxScore:", fox_score)
 		FoxController.fox_instance.mood = FoxController.fox_instance.Mood.HAPPY
 	elif idle_timer < idle_threshold:
+		fox_score+= 1
+		print("FoxScore:", fox_score)
 		FoxController.fox_instance.mood = FoxController.fox_instance.Mood.NEUTRAL
 	else:
+		fox_score -= 2
+		print("FoxScore:", fox_score)
 		FoxController.fox_instance.mood = FoxController.fox_instance.Mood.ANNOYED
-		
+
+func show_fox_final_comment():
+	var fox = FoxController.fox_instance
+	var line = ""
+
+	if fox_score >= 6:
+		line = "Ты справился. Быстро, точно. Приятно удивлённа."
+	elif fox_score >= 3:
+		line = "Ну, ты не худший ученик. В лесу мог бы и выжить."
+	else:
+		line = "Ты жив. Это уже победа. Но мы с тобой ещё поработаем."
+	
+	print("Final fox_score: ", fox_score)
+	print("Chosen line: ", line)
+	fox.suggest_next_step(line)
+	Global.set_reputation("fox", fox_score)
+
+	await get_tree().create_timer(3.5).timeout
+	get_tree().quit()  # Теперь можно завершить
