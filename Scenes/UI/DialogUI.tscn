@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=3 uid="uid://blfarrs2uy2j8"]
 
 [ext_resource type="Script" uid="uid://dcjarj8l2vlfk" path="res://Scripts/UI/DialogUI.gd" id="1_qjaxh"]
-[ext_resource type="AudioStream" uid="uid://bantlpchpcg8i" path="res://Assets/Audio/Dialog/mixkit-sci-fi-typewriter-sound-1370-_1_.wav" id="2_scfrx"]
+[ext_resource type="AudioStream" uid="uid://dp2tdy576o8ev" path="res://Assets/Audio/Dialog/zvuk-poyavleniya-teksta-na-ekrane-interfeys-31001.wav" id="2_scfrx"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4ta1a"]
 content_margin_left = 20.0
@@ -44,4 +44,4 @@ autowrap_mode = 3
 
 [node name="LetterSound" type="AudioStreamPlayer" parent="Panel"]
 stream = ExtResource("2_scfrx")
-volume_db = 4.675
+volume_db = -23.783
