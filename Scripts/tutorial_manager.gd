@@ -44,7 +44,7 @@ var initial_dialog = ["О, ты проснулся. Я уж думала, ты �
 var hint_indices := {}
 
 var idle_timer := 0.0
-var idle_threshold := 15.0
+var idle_threshold := 8.0
 var stage_last_updated_time := 0.0
 
 func _ready():

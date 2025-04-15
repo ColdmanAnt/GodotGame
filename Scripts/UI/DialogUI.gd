@@ -11,13 +11,15 @@ var current_line_index: int = 0
 var full_text: String = ""
 var current_text: String = ""
 var is_typing: bool = false
-
+var sound_delay = 2
 var on_dialog_finished_callback: Callable = Callable()
 
 # Эти переменные нужны для покадровой логики:
 var _typing_index: int = 0     # индекс текущего символа в строке
 var _timer: float = 0.0        # счётчик времени для вывода следующей буквы
 
+@onready var letter_sound: AudioStreamPlayer = $Panel/LetterSound
+var sound = load("res://Assets/Audio/Dialog/mixkit-sci-fi-typewriter-sound-1370-_1_.wav")
 @onready var label: Label = $Panel/Label
 
 func _ready() -> void:
@@ -56,12 +58,16 @@ func _process(delta: float) -> void:
 			_timer = 0.0
 			# Если ещё есть буквы для вывода:
 			if _typing_index < full_text.length():
-				current_text += full_text[_typing_index]
+				var next_char = full_text[_typing_index]
+				current_text += next_char
 				_typing_index += 1
 				label.text = current_text
+				if next_char != " ":
+					letter_sound.play()
 			else:
 				# Все буквы уже выведены, завершаем процесс печати
 				label.text = full_text
+				letter_sound.stop()  # Останавливаем звук, когда текст полностью выведен
 				is_typing = false
 
 func _input(event: InputEvent) -> void:
