@@ -44,7 +44,7 @@ var initial_dialog = ["О, ты проснулся. Я уж думала, ты �
 var hint_indices := {}
 
 var idle_timer := 0.0
-var idle_threshold := 4.0
+var idle_threshold := 15.0
 var stage_last_updated_time := 0.0
 
 func _ready():
@@ -58,7 +58,7 @@ func setup_connections():
 	get_parent().call_deferred("add_child", dialog_ui_instance)
 	await get_tree().process_frame
 	
-	dialog_ui_instance.show_dialog(initial_dialog)
+	dialog_ui_instance.show_dialog(initial_dialog, Callable(self, "on_dialog_finished"))
 	fox.initial()
 	dialog_ui_instance.connect("dialog_finished", Callable(self, "_on_dialog_finished"))
 	
@@ -104,10 +104,9 @@ func check_idle_hint():
 
 func on_dialog_finished():
 	current_stage = Stage.AFTER_DIALOG
-	update_fox_mood()
 	idle_timer = 0.0
 	stage_last_updated_time = 0.0
-	dialog_ui_instance.show_dialog(["Диалог завершён. Теперь подними топор."])
+	dialog_ui_instance.show_dialog(["Ну я сказала все что хотела. Теперь подними топор."])
 
 func on_axe_picked():
 	if current_stage != Stage.AFTER_DIALOG:
@@ -173,7 +172,7 @@ func try_attack():
 	enemy.die()
 
 func update_fox_mood():
-	if idle_timer < idle_threshold/2:
+	if idle_timer < idle_threshold/2.0:
 		fox_score += 2
 		print("FoxScore:", fox_score)
 		FoxController.fox_instance.mood = FoxController.fox_instance.Mood.HAPPY
