@@ -10,6 +10,10 @@ enum Stage {
 }
 var current_stage = Stage.START
 var fox_score := 0
+var DialogUIScene = preload("res://Scenes/UI/DialogUI.tscn")
+var dialog_ui_instance: DialogUI
+
+
 
 var hint_messages := {
 	Stage.AFTER_DIALOG: [
@@ -34,10 +38,13 @@ var hint_messages := {
 	]
 }
 
+var initial_dialog = ["О, ты проснулся. Я уж думала, ты останешься тут навсегда.",
+		"Меня зовут.... Просто называй меня лисой. Я тут, чтобы тебя не отпускать бездарно умирать."]
+
 var hint_indices := {}
 
 var idle_timer := 0.0
-var idle_threshold := 15.0
+var idle_threshold := 4.0
 var stage_last_updated_time := 0.0
 
 func _ready():
@@ -46,6 +53,15 @@ func _ready():
 
 func setup_connections():
 	var fox = FoxController.spawn_fox()
+	
+	dialog_ui_instance = DialogUIScene.instantiate()
+	get_parent().call_deferred("add_child", dialog_ui_instance)
+	await get_tree().process_frame
+	
+	dialog_ui_instance.show_dialog(initial_dialog)
+	fox.initial()
+	dialog_ui_instance.connect("dialog_finished", Callable(self, "_on_dialog_finished"))
+	
 
 	get_parent().call_deferred("add_child", fox) # или get_tree().get_root().add_child(fox)
 	fox.connect("dialog_finished",Callable(self, "on_dialog_finished"))
@@ -59,6 +75,8 @@ func setup_connections():
 	
 	var enemy = get_parent().get_node("Enemy")
 	enemy.connect("enemy_defeated", Callable(self, "on_enemy_defeated"))
+
+
 
 func _process(delta: float):
 	idle_timer += delta
@@ -76,32 +94,34 @@ func check_idle_hint():
 
 		if idx < messages.size():
 			var message = messages[idx]
-			FoxController.fox_instance.suggest_next_step(message)
+			dialog_ui_instance.show_dialog([message])
 			hint_indices[stage] = idx + 1
 		else:
 			# Всё. Она больше не будет повторяться. Считай, ты её утомил.
 			pass
+
+
 func on_dialog_finished():
 	current_stage = Stage.AFTER_DIALOG
 	update_fox_mood()
 	idle_timer = 0.0
 	stage_last_updated_time = 0.0
-	print("Диалог завершён. Теперь подними топор.")
+	dialog_ui_instance.show_dialog(["Диалог завершён. Теперь подними топор."])
 
 func on_axe_picked():
 	if current_stage != Stage.AFTER_DIALOG:
-		print("Рановато хвататься за оружие, воин.")
+		dialog_ui_instance.show_dialog(["Рановато хвататься за оружие, воин."])
 		return
 	update_fox_mood()
 	idle_timer = 0.0
 	stage_last_updated_time = 0.0
 	current_stage = Stage.GOT_AXE
-	print("Топор взят. Теперь сядь.")
+	dialog_ui_instance.show_dialog(["Он хоть и старый, но на первое время поможет, теперь сядь на пенек"])
 
 func on_sit_down():
 	match current_stage:
 		Stage.START, Stage.AFTER_DIALOG:
-			print("Сначала нужно взять топор, а не искать где сесть.")
+			dialog_ui_instance.show_dialog(["Сначала нужно взять топор, а не искать где сесть."])
 			return
 		Stage.GOT_AXE:
 			current_stage = Stage.SAT_DOWN
@@ -109,27 +129,27 @@ func on_sit_down():
 			update_fox_mood()
 			idle_timer = 0.0
 			stage_last_updated_time = 0.0
-			print("Игрок сел.")
+			dialog_ui_instance.show_dialog(["Если ты сядешь отдохнуть, то выносливость будет востанавливаться быстрее, а теперь давай вставай, пора в путь"])
 		_:
-			print("Ты уже сел. Второй раз не надо.")
+			dialog_ui_instance.show_dialog(["Ты уже сел. Второй раз не надо."])
 
 func on_stand_up():
 	if current_stage != Stage.SAT_DOWN:
-		print("А ты что, уже сидел?! Я такого не помню.")
+		dialog_ui_instance.show_dialog(["А ты что, уже сидел?! Я такого не помню. Отдыхать - важно"])
 		return
 	current_stage = Stage.STANDING_UP
 	get_parent().get_node("Stump").set_sitting(false)
 	update_fox_mood()
 	idle_timer = 0.0
 	stage_last_updated_time = 0.0
-	print("Игрок встал, вызываю врага")
+	dialog_ui_instance.show_dialog(["Игрок встал, вызываю врага"])
 
 func on_enemy_defeated():
 	if current_stage != Stage.STANDING_UP:
-		print("Может всё таки встанешь уже? Чего прохлаждаешься")
+		dialog_ui_instance.show_dialog(["Может всё таки встанешь уже? Чего прохлаждаешься"])
 		return
 	current_stage = Stage.ENEMY_DEFEATED
-	print("Урок окончен.")
+	dialog_ui_instance.show_dialog(["Урок окончен."])
 
 	show_fox_final_comment()
 
@@ -177,7 +197,7 @@ func show_fox_final_comment():
 		line = "Ты жив. Это уже победа. Но мы с тобой ещё поработаем."
 	
 	print("Final fox_score: ", fox_score)
-	print("Chosen line: ", line)
+	dialog_ui_instance.show_dialog([line])
 	fox.suggest_next_step(line)
 	Global.set_reputation("fox", fox_score)
 
